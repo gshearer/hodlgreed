@@ -34,7 +34,7 @@ It's beyond the scope of this README to assist with gekko related config and set
 Give buy advice price reaches this level or lower. If you use the dynamically adjusting feature you can set this to a very small number such as 0.0000001 and the script will automatically adjust to mean price minus your percentage for the first buy.
 
 # max_nobuy_candles (integer)
-If this many candles go by without a buy, adjust buy_at_or_below price.  This setting must be equal to or greater than your SMA interval. Set this to zero to disable dynamic adjusting.
+If this many candles go by without a buy, adjust buy_at_or_below price. Note that adjust mode will not work until you've had enough candles pass by for SMA to be calculated. If for example you have SMA interval set to 60, then adjust mode can't possibly work until the bot sees candle #61 even if you have this set to something smaller. However, once SMA interval has been reached, it will honor this setting at all times.
 
 # adjust (percentage)
 Adjust buy_at_or_below price by this percentage below SMA (mean) price.
@@ -84,6 +84,7 @@ IRC support is VERY basic. The bot will only accept commands from the nickname m
 # ;;set
 - Allows you to change greed, buy_at_or_below price, adjust, stoploss variables.
 - You can also suspend trading with: ;;set hodl on or resume trading with: ;;set hodl off
+- You can also set 'getout' mode which will cause the bot to suspend trading AFTER the next sell.
 
 # Acknowledgements
 - HUGE Thank you to Mike van Rossum the original author of Gekko.
