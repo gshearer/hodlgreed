@@ -5,10 +5,6 @@
 //                         doc at-sign drow dot org                         \\
 // ------------------------------------------------------------------------ \\
 
-//
-// sma interval -- this is used to calculate the mean price. The higher
-// the number the more accurate (in theory) it is.
-// 
 // HUGE Thank you to Mike van Rossum the original author of Gekko.
 //
 // Also would like to thank all Gekko strategy authors who publish their code.
