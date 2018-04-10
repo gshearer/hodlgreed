@@ -21,7 +21,7 @@ Standard disclaimer: THIS IS EXPERIMENTAL SOFTWARE. It is subject to change with
 - Greed!
 
 # Installation
-It's beyond the scope of this README to assist with gekko related configi and setup. Please see Gekko wiki for documentation on the bot itself.
+It's beyond the scope of this README to assist with gekko related config and setup. Please see Gekko wiki for documentation on the bot itself.
 
 - Copy the hodlgreed.js file to your gekko/strategies folder
 - Copy the hodlgreed.toml file to your gekko/config/strategies folder
