@@ -52,12 +52,13 @@ var trend_type = 'unknown';
 var chistory = [];
 chistory.length = settings.sma.interval;
 var last_action = (buy_price) ? 'buy' : 'sell';
-var version = '2018041001';
+var version = '2018041003';
 var last_candle = 'none';
 var motd = 'none';
 var hodl = {};
 var force_trade = 'none';
 var hodl_mode = false;
+var getout = false;
 
 hodl.log = function(candle) { }
 
@@ -84,7 +85,7 @@ hodl.ircmsg = function(from, to, message)
         this.ircbot.say(replyto, 'commands: status, set, buy, sell, cancel, candle');
         break;
       case ';;status':
-        this.ircbot.say(replyto, 'buyat: ' + bid.toFixed(digits) + ' stoploss: ' + settings.stoploss + ' greed: ' + greed + ' last_buy: ' + buy_price + ' potential_profit: ' + profit.toFixed(2) + '% last_sell: ' + sell_price + ' (' + last_profit.toFixed(2) + '%) nobuys: ' + cc_nobuys + ' adjust: ' + adjust + ' trading-disabled: ' + hodl_mode);
+        this.ircbot.say(replyto, 'buyat: ' + bid.toFixed(digits) + ' last_buy: ' + buy_price + ' (' + profit.toFixed(2) + '%) last_sell: ' + sell_price + ' (' + last_profit.toFixed(2) + '%) nobuys: ' + cc_nobuys + ' adjust: ' + adjust + ' stoploss: ' + settings.stoploss + ' greed: ' + greed + ' trading-disabled: ' + hodl_mode + ' getout: ' + getout);
         break;
       case ';;buy':
         this.ircbot.say(replyto, 'Setting buy condition for candle #' + (cc+1));
@@ -122,8 +123,12 @@ hodl.ircmsg = function(from, to, message)
               stoploss = parseFloat(args[2]);
               this.ircbot.say(replyto, 'stoploss set to ' + stoploss);
               break;
+            case 'nobuys':
+              nobuys = parseFloat(args[2]);
+              this.ircbot.say(replyto, 'max_nobuy_candles set to ' + nobuys);
+              break;
             case 'hodl':
-              if(args[2] == 'on')
+              if(args[2] == 'on' || args[2] == 'true')
               {
                 hodl_mode = true;
                 this.ircbot.say(replyto, 'Trading suspended')
@@ -134,13 +139,25 @@ hodl.ircmsg = function(from, to, message)
                 this.ircbot.say(replyto, 'Trading enabled');
               }
               break;
+            case 'getout':
+              if(args[2] == 'on' || args[2] == 'true')
+              {
+                getout = true;
+                this.ircbot.say(replyto, 'Trading will suspend after next sell');
+              }
+              else
+              {
+                getout = false;
+                this.ircbot.say(replyto, 'Trading will not suspend after next sell');
+              }
+              break;
             default:
               this.ircbot.say(replyto, 'Unsupported setting');
               break;
           }
         }
         else
-          this.ircbot.say(replyto,'usage: set <greed || buyat || adjust || stoploss>');
+          this.ircbot.say(replyto,'usage: set <greed || buyat || adjust || stoploss || nobuys || getout>');
         break;
     }
   }
@@ -157,9 +174,6 @@ hodl.init = function()
     this.ircbot.addListener('error', log.debug);
     this.ircbot.addListener('message', this.ircmsg);
   }
-
-  if(settings.max_nobuy_candles > 0 && settings.max_nobuy_candles < settings.sma.interval)
-    throw new Error('[hodlgreed] max_nobuy_candles must be greater than or equal to SMA interval');
 
   if(settings.sma.interval < 1)
     throw new Error('[hodlgreed] You must include SMA interval in settings.');
@@ -242,6 +256,11 @@ hodl.check = function(candle)
       cc_nobuys = 0;
       last_profit = profit;
       force_trade = 'none';
+      if(getout == true)
+      {
+        hodl_mode == true;
+        this.notify('[[[ Trading suspended due to user asking us to GET OUT :) ]]]');
+      }
       this.notify('[[ SELL #' + sell_num + ' ]] price: ' + candle.close.toFixed(digits) + ' profit: ' + profit.toFixed(2));
       this.advice('short');
     }
@@ -265,7 +284,7 @@ hodl.check = function(candle)
         }
 
         // Max no buy candles?
-        else if(cc_nobuys >= settings.max_nobuy_candles && candle.close > bid)
+        else if(cc_nobuys >= nobuys && candle.close > bid && sma != 0)
         {
           this.notify(' [[[ Adjusted buy_at_or_below from ' + bid + ' to ' + newbid + ' due to max_nobuy_candles ]]]');
           bid = newbid;
@@ -304,7 +323,13 @@ hodl.check = function(candle)
         hodl_mode = true;
         this.notify('[[ STOPLOSS ENGAGED -- Trading disabled. ]]');
       }
+      else if(getout == true)
+      {
+        hodl_mode == true;
+        this.notify('[[[ Trading suspended due to user asking us to GET OUT :) ]]]');
+      }
     }
+
 
     // No advice to give? :(
     if(adviced == false)
