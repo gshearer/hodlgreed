@@ -1,0 +1,20 @@
+buy_at_or_below=0.0000001
+last_buy_price=0
+max_nobuy_candles=60
+adjust=1.2
+greed=1.5
+stoploss=0
+
+[sma]
+interval=60
+
+[irc]
+enabled=false
+server=yourircserver
+port=6667
+nickname=hodlgreed
+realName=hodlgreed
+userName=hodlgreed
+owner=yournick
+password=null
+channels=[ '#chan1', '#chan2' ]
