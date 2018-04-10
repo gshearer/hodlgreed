@@ -21,6 +21,8 @@ Standard disclaimer: THIS IS EXPERIMENTAL SOFTWARE. It is subject to change with
 - Greed!
 
 # Settings
+- This script manages it's own history. So you can use ZERO for Gekko's warm up period.
+
 # buy_at_or_below (floating point)
 Give buy advice price reaches this level or lower. If you use the dynamically adjusting feature you can set this to a very small number such as 0.0000001 and the script will automatically adjust to mean price minus your percentage for the first buy.
 
@@ -42,6 +44,9 @@ Normally the script will only offer buy advice for the first trade. This presume
 This is useful if you had to restart your gekko process while you were HODL'ing an asset.
 
 Note: Use of this feature will disable buy advice until the first sell has been advised.
+
+# SMA Interval
+How many candles are required to calculate SMA (mean price). 
 
 # IRC
 This strategy uses NodeJS irc library. The full list of settings are here https://github.com/martynsmith/node-irc/blob/master/lib/irc.js
@@ -72,3 +77,14 @@ IRC support is VERY basic. The bot will only accept commands from the nickname m
 # ;;set
 - Allows you to change greed, buy_at_or_below price, adjust, stoploss variables.
 - You can also suspend trading with: ;;set hodl on or resume trading with: ;;set hodl off
+
+# Acknowledgements
+- HUGE Thank you to Mike van Rossum the original author of Gekko.
+
+# Donations
+Please consider donating if you have found this software beneficial? I accept Chipotle gift cards, Lambos, and of course Cryptos! :)  Thank you!!!
+
+- BTC: 1EdzJHrtQnpjWmRqC93Gq8b6gEi5QgahVk
+- LTC: LeoVNreMB64gpQcch12RL5xmz263CFRXZb
+- ETH: 0x4087ac736000594d624d25ed0d3abf5b465a7525
+- XMR: 44oTLFQGPdP8ktEHDB3Vcg5otvZFn3w4c3bvEeGutP2916aPcZEMJ3v1YYvnGqbqb1LoiRXCKg7d2aNQs2WcLgezT5Pf7uT
