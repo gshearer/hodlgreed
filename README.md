@@ -20,6 +20,13 @@ Standard disclaimer: THIS IS EXPERIMENTAL SOFTWARE. It is subject to change with
 - Stoploss support
 - Greed!
 
+# Installation
+It's beyond the scope of this README to assist with gekko related configi and setup. Please see Gekko wiki for documentation on the bot itself.
+
+- Copy the hodlgreed.js file to your gekko/strategies folder
+- Copy the hodlgreed.toml file to your gekko/config/strategies folder
+- The hodlgreed-cli.js file is an example configuration for launching this strategy with gekko from the command line. It can be stored anywhere gekko can find it.
+
 # Settings
 - This script manages it's own history. So you can use ZERO for Gekko's warm up period.
 
