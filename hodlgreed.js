@@ -163,7 +163,7 @@ hodl.ircmsg = function(from, to, message)
           }
         }
         else
-          this.ircbot.say(replyto,'usage: set <greed || buyat || adjust || stoploss || nobuys || getout>');
+          this.ircbot.say(replyto,'usage: set <greed || buyat || adjust || stoploss || nobuys || getout || buyprice>');
         break;
     }
   }
