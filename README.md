@@ -82,7 +82,7 @@ IRC support is VERY basic. The bot will only accept commands from the nickname m
 - Shows various statistics about the last known candle
 
 # ;;set
-- Allows you to change greed, buy_at_or_below price, adjust, stoploss variables.
+- Allows you to change greed, buy_at_or_below price, adjust, stoploss, and buyat variables.
 - You can also suspend trading with: ;;set hodl on or resume trading with: ;;set hodl off
 - You can also set 'getout' mode which will cause the bot to suspend trading AFTER the next sell.
 
