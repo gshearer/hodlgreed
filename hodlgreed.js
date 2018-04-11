@@ -157,12 +157,12 @@ hodl.ircmsg = function(from, to, message)
             case 'hodl_after_stoploss':
               if(args[2] == 'on' || args[2] == 'true')
               {
-                getout = true;
+                hodl_after_stoploss = true;
                 this.ircbot.say(replyto, 'Trading will suspend after stoploss');
               }
               else
               {
-                getout = false;
+                hodl_after_stoploss = false;
                 this.ircbot.say(replyto, 'Trading will not suspend after a stoploss');
               }
               break;
