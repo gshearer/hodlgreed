@@ -4,6 +4,7 @@ max_nobuy_candles=60
 adjust=1.2
 greed=1.5
 stoploss=0
+hodl_after_stoploss=true
 
 [sma]
 interval=60
