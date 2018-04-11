@@ -52,6 +52,9 @@ This is useful if you had to restart your gekko process while you were HODL'ing 
 
 Note: Use of this feature will disable buy advice until the first sell has been advised.
 
+# hodl_after_stoploss (boolean)
+You can set this to true or false. If set to true, the script will cease trading if a stoploss occurs. You can re-enable trading manually through the IRC interface with ';;set hodl off'.
+
 # SMA Interval
 How many candles are required to calculate SMA (mean price). 
 
@@ -83,8 +86,9 @@ IRC support is VERY basic. The bot will only accept commands from the nickname m
 
 # ;;set
 - Allows you to change greed, buy_at_or_below price, adjust, stoploss, and buyat variables.
-- You can also suspend trading with: ;;set hodl on or resume trading with: ;;set hodl off
-- You can also set 'getout' mode which will cause the bot to suspend trading AFTER the next sell.
+- To suspend trading: ;;set hodl on
+- To suspend trading AFTER the next sell: ;;set getout on
+- To suspend trading AFTER a stoploss: ;;set hodl_after_stoploss on
 
 # Acknowledgements
 - HUGE Thank you to Mike van Rossum the original author of Gekko.
