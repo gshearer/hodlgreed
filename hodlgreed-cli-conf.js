@@ -15,6 +15,7 @@ config.hodlgreed = {
   stoploss: 0,
   greed: 2,
   sma: { interval: 60 },
+  hodl_after_stoploss: true,
   irc: {
     enabled: true,
     server: 'irc.server.com',
