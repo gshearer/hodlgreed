@@ -53,13 +53,14 @@ var trend_type = 'unknown';
 var chistory = [];
 chistory.length = settings.sma.interval;
 var last_action = (buy_price) ? 'buy' : 'sell';
-var version = '2018041101';
+var version = '2018041102';
 var last_candle = 'none';
 var motd = 'none';
 var hodl = {};
 var force_trade = 'none';
 var hodl_mode = false;
 var getout = false;
+var hodl_after_stoploss = settings.hodl_after_stoploss;
 
 hodl.log = function(candle) { }
 
@@ -86,7 +87,7 @@ hodl.ircmsg = function(from, to, message)
         this.ircbot.say(replyto, 'commands: status, set, buy, sell, cancel, candle');
         break;
       case ';;status':
-        this.ircbot.say(replyto, 'buyat: ' + bid.toFixed(digits) + ' last_buy: ' + buy_price + ' (' + profit.toFixed(2) + '%) last_sell: ' + sell_price + ' (' + last_profit.toFixed(2) + '%) nobuys: ' + cc_nobuys + ' adjust: ' + adjust + ' stoploss: ' + settings.stoploss + ' greed: ' + greed + ' trading-disabled: ' + hodl_mode + ' getout: ' + getout);
+        this.ircbot.say(replyto, 'buyat: ' + bid.toFixed(digits) + ' last_buy: ' + buy_price + ' (' + profit.toFixed(2) + '%) last_sell: ' + sell_price + ' (' + last_profit.toFixed(2) + '%) nobuys: ' + cc_nobuys + ' adjust: ' + adjust + ' stoploss: ' + settings.stoploss + ' greed: ' + greed + ' trading-disabled: ' + hodl_mode + ' getout: ' + getout + ' hodl_after_SL: ' + hodl_after_stoploss);
         break;
       case ';;buy':
         this.ircbot.say(replyto, 'Setting buy condition for candle #' + (cc+1));
@@ -153,6 +154,18 @@ hodl.ircmsg = function(from, to, message)
                 this.ircbot.say(replyto, 'Trading will not suspend after next sell');
               }
               break;
+            case 'hodl_after_stoploss':
+              if(args[2] == 'on' || args[2] == 'true')
+              {
+                getout = true;
+                this.ircbot.say(replyto, 'Trading will suspend after stoploss');
+              }
+              else
+              {
+                getout = false;
+                this.ircbot.say(replyto, 'Trading will not suspend after a stoploss');
+              }
+              break;
             case 'buyprice':
               buy_price = parseFloat(args[2]);
               this.ircbot.say(replyto, 'buy_price set to ' + buy_price + ' - next advice will be sell.');
@@ -164,7 +177,10 @@ hodl.ircmsg = function(from, to, message)
           }
         }
         else
-          this.ircbot.say(replyto,'usage: set <greed || buyat || adjust || stoploss || nobuys || getout || buyprice>');
+        {
+          this.ircbot.say(replyto,'usage: set <greed || buyat || adjust || stoploss || nobuys || buyprice> <number>');
+          this.ircbot.say(replyto,'usage: set <hodl || getout || hodl_after_stoploss> <on || off>');
+        }
         break;
     }
   }
@@ -325,7 +341,7 @@ hodl.check = function(candle)
       this.notify('[[ SELL #' + sell_num + ' ]] price: ' + candle.close.toFixed(digits) + ' profit: ' + profit.toFixed(2));
       this.advice('short');
 
-      if(profit < 0)
+      if(profit < 0 && hodl_after_stoploss == true)
       {
         hodl_mode = true;
         this.notify('[[ STOPLOSS ENGAGED -- Trading disabled. ]]');
