@@ -45,6 +45,7 @@ var settings = config.hodlgreed;
 var digits = 8, sma = 0, trend = 0, cc = 0, cc_nobuys = 0, hp = 0;
 var buy_num = 0, sell_num = 0, profit = 0, last_profit = 0, buy_price = settings.last_buy_price, sell_price = 0;
 var bid = settings.buy_at_or_below;
+var max_nobuy_candles = settings.max_nobuy_candles;
 var adjust = settings.adjust;
 var greed = settings.greed;
 var color = 'unknown';
@@ -125,8 +126,8 @@ hodl.ircmsg = function(from, to, message)
               this.ircbot.say(replyto, 'stoploss set to ' + stoploss);
               break;
             case 'nobuys':
-              nobuys = parseFloat(args[2]);
-              this.ircbot.say(replyto, 'max_nobuy_candles set to ' + nobuys);
+              max_nobuy_candles = parseFloat(args[2]);
+              this.ircbot.say(replyto, 'max_nobuy_candles set to ' + max_nobuy_candles);
               break;
             case 'hodl':
               if(args[2] == 'on' || args[2] == 'true')
@@ -290,7 +291,7 @@ hodl.check = function(candle)
         }
 
         // Max no buy candles?
-        else if(cc_nobuys >= nobuys && candle.close > bid && sma != 0)
+        else if(cc_nobuys >= max_nobuy_candles && candle.close > bid && sma != 0)
         {
           this.notify(' [[[ Adjusted buy_at_or_below from ' + bid + ' to ' + newbid + ' due to max_nobuy_candles ]]]');
           bid = newbid;
