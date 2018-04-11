@@ -52,7 +52,7 @@ var trend_type = 'unknown';
 var chistory = [];
 chistory.length = settings.sma.interval;
 var last_action = (buy_price) ? 'buy' : 'sell';
-var version = '2018041003';
+var version = '2018041101';
 var last_candle = 'none';
 var motd = 'none';
 var hodl = {};
@@ -113,7 +113,8 @@ hodl.ircmsg = function(from, to, message)
               break;
             case 'buyat':
               bid = parseFloat(args[2]);
-              this.ircbot.say(replyto, 'buy_at_or_below set to ' + bid);
+              cc_nobuys = 0;
+              this.ircbot.say(replyto, 'buy_at_or_below set to ' + bid + ' -- nobuys counter reset to 0.');
               break;
             case 'adjust':
               adjust = parseFloat(args[2]);
@@ -150,6 +151,11 @@ hodl.ircmsg = function(from, to, message)
                 getout = false;
                 this.ircbot.say(replyto, 'Trading will not suspend after next sell');
               }
+              break;
+            case 'buyprice':
+              buy_price = parseFloat(args[2]);
+              this.ircbot.say(replyto, 'buy_price set to ' + buy_price + ' - next advice will be sell.');
+              last_action = 'buy';
               break;
             default:
               this.ircbot.say(replyto, 'Unsupported setting');
