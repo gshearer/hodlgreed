@@ -266,7 +266,7 @@ hodl.check = function(candle)
       buy_price = candle.close;
       buy_num++;
       force_trade = 'none';
-      this.notify('[[ BUY #' + buy_num + ' ]] price: ' + candle.close.toFixed(digits));
+      this.notify('[[ BUY #' + buy_num + ' due to forced trade ]] price: ' + candle.close.toFixed(digits));
       this.advice('long');
     }
     else if(force_trade == 'sell')
@@ -341,10 +341,18 @@ hodl.check = function(candle)
       this.notify('[[ SELL #' + sell_num + ' ]] price: ' + candle.close.toFixed(digits) + ' profit: ' + profit.toFixed(2));
       this.advice('short');
 
-      if(profit < 0 && hodl_after_stoploss == true)
+      if(profit < 0)
       {
-        hodl_mode = true;
-        this.notify('[[ STOPLOSS ENGAGED -- Trading disabled. ]]');
+        if(hodl_after_stoploss == true)
+        {
+          hodl_mode = true;
+          this.notify('[[ STOPLOSS ENGAGED -- Trading disabled. ]]');
+        }
+        else if(bid <= candle.close)
+        {
+          bid = candle.close * 1.05;
+          this.notify('[[ Adjusted buy_at_or_below to ' + bid.toFixed(digits) + ' to prevent immediate buy after stoploss ]]');
+        }
       }
       else if(getout == true)
       {
