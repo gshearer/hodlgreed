@@ -43,7 +43,7 @@ var settings = config.hodlgreed;
 
 // Globals
 var digits = 8, sma = 0, trend = 0, cc = 0, cc_nobuys = 0, hp = 0;
-var buy_num = 0, sell_num = 0, profit = 0, last_profit = 0, buy_price = settings.last_buy_price, sell_price = 0;
+var buy_num = 0, sell_num = 0, profit = 0, profit_pct = 0, last_profit = 0, last_profit_pct = 0, buy_price = settings.last_buy_price, sell_price = 0;
 var bid = settings.buy_at_or_below;
 var max_nobuy_candles = settings.max_nobuy_candles;
 var adjust = settings.adjust;
@@ -53,7 +53,7 @@ var trend_type = 'unknown';
 var chistory = [];
 chistory.length = settings.sma.interval;
 var last_action = (buy_price) ? 'buy' : 'sell';
-var version = '2018041102';
+var version = '2018041501';
 var last_candle = 'none';
 var motd = 'none';
 var hodl = {};
@@ -61,6 +61,13 @@ var force_trade = 'none';
 var hodl_mode = false;
 var getout = false;
 var hodl_after_stoploss = settings.hodl_after_stoploss;
+
+var stats = {
+  wins: 0,
+  losses: 0,
+  profit: 0,
+  profit_pct: 0,
+}
 
 hodl.log = function(candle) { }
 
@@ -84,10 +91,13 @@ hodl.ircmsg = function(from, to, message)
     switch(args[0])
     {
       case ';;help':
-        this.ircbot.say(replyto, 'commands: status, set, buy, sell, cancel, candle');
+        this.ircbot.say(replyto, 'commands: status, set, buy, sell, cancel, candle, profit');
         break;
       case ';;status':
-        this.ircbot.say(replyto, 'buyat: ' + bid.toFixed(digits) + ' last_buy: ' + buy_price + ' (' + profit.toFixed(2) + '%) last_sell: ' + sell_price + ' (' + last_profit.toFixed(2) + '%) nobuys: ' + cc_nobuys + ' adjust: ' + adjust + ' stoploss: ' + settings.stoploss + ' greed: ' + greed + ' trading-disabled: ' + hodl_mode + ' getout: ' + getout + ' hodl_after_SL: ' + hodl_after_stoploss);
+        this.ircbot.say(replyto, 'buyat: ' + bid.toFixed(digits) + ' last_buy: ' + buy_price + ' (' + profit_pct.toFixed(2) + '%) last_sell: ' + sell_price + ' (' + last_profit_pct.toFixed(2) + '%) nobuys: ' + cc_nobuys + ' adjust: ' + adjust + ' stoploss: ' + settings.stoploss + ' greed: ' + greed + ' trading-disabled: ' + hodl_mode + ' getout: ' + getout + ' hodl_after_SL: ' + hodl_after_stoploss);
+        break;
+      case ';;profit':
+        this.ircbot.say(replyto,'cur prof: ' + profit.toFixed(digits) + ' (' + profit_pct.toFixed(2) + '%) total prof: ' + stats.profit.toFixed(digits) + ' (' + stats.profit_pct.toFixed(2) + '%) wins: ' + stats.wins + ' losses: ' + stats.losses);
         break;
       case ';;buy':
         this.ircbot.say(replyto, 'Setting buy condition for candle #' + (cc+1));
@@ -245,12 +255,13 @@ hodl.check = function(candle)
     sma = sum / settings.sma.interval;
   }
 
-  profit = (buy_price) ? (candle.close - buy_price) / buy_price * 100 : 0;
+  profit = (buy_price) ? candle.close - buy_price : 0;
+  profit_pct = (buy_price) ? (candle.close - buy_price) / buy_price * 100 : 0;
   trend = (trend_type == color) ? trend + 1 : 1;
   trend_type = color;
   diff = candle.close - bid;
 
-  last_candle = '#' + cc + ' ' + color + ' (' + trend + ') close: ' + candle.close.toFixed(digits) + ' bid: ' + bid.toFixed(digits) + ' diff: ' + diff.toFixed(digits) + ' sma: ' + sma.toFixed(digits) + ' nobuys: ' + cc_nobuys + ' prof: ' + profit.toFixed(2) + ' greed: ' + greed;
+  last_candle = '#' + cc + ' ' + color + ' (' + trend + ') close: ' + candle.close.toFixed(digits) + ' bid: ' + bid.toFixed(digits) + ' diff: ' + diff.toFixed(digits) + ' sma: ' + sma.toFixed(digits) + ' nobuys: ' + cc_nobuys + ' prof: ' + profit.toFixed(digits) + ' (' + profit_pct.toFixed(2) + '%) greed: ' + greed;
   log.debug(last_candle);
 
   // Should we offer advice?
@@ -261,7 +272,7 @@ hodl.check = function(candle)
     {
       last_action = 'buy';
       cc_nobuys = 0;
-      last_profit = sell_price = 0;
+      last_profit_pct = last_profit = sell_price = 0;
       adviced = true;
       buy_price = candle.close;
       buy_num++;
@@ -273,18 +284,27 @@ hodl.check = function(candle)
     {
       sell_num++;
       sell_price = candle.close;
+      stats.profit += sell_price - buy_price;
+      stats.profit_pct += profit_pct;
       buy_price = 0;
       adviced = true;
       last_action = 'sell';
       cc_nobuys = 0;
       last_profit = profit;
+      last_profit_pct = profit_pct;
       force_trade = 'none';
+
+      if(profit < 0)
+        stats.losses++;
+      else
+        stats.wins++;
+
       if(getout == true)
       {
         hodl_mode == true;
         this.notify('[[[ Trading suspended due to user asking us to GET OUT :) ]]]');
       }
-      this.notify('[[ SELL #' + sell_num + ' ]] price: ' + candle.close.toFixed(digits) + ' profit: ' + profit.toFixed(2));
+      this.notify('[[ SELL #' + sell_num + ' ]] price: ' + candle.close.toFixed(digits) + ' profit: ' + profit.toFixed(digits) + ' (' + profit_pct.toFixed(2) + '%)');
       this.advice('short');
     }
 
@@ -319,7 +339,7 @@ hodl.check = function(candle)
       {
         buy_num++;
         buy_price = candle.close;
-        last_profit = sell_price = 0;
+        last_profit_pct = last_profit = sell_price = 0;
         cc_nobuys = 0;
         last_action = 'buy';
         adviced = true;
@@ -329,20 +349,24 @@ hodl.check = function(candle)
     }
 
     // Should we sell?
-    if(last_action == 'buy' && adviced == false && (profit >= greed || (settings.stoploss > 0 && profit < 0 && (profit * -1) >= settings.stoploss)))
+    if(last_action == 'buy' && adviced == false && (profit_pct >= greed || (settings.stoploss > 0 && profit_pct < 0 && (profit_pct * -1) >= settings.stoploss)))
     {
       sell_num++;
       sell_price = candle.close;
+      stats.profit += sell_price - buy_price;
+      stats.profit_pct += profit_pct;
       buy_price = 0;
       adviced = true;
       last_action = 'sell';
       cc_nobuys = 0;
       last_profit = profit;
-      this.notify('[[ SELL #' + sell_num + ' ]] price: ' + candle.close.toFixed(digits) + ' profit: ' + profit.toFixed(2));
+      last_profit_pct = profit_pct;
+      this.notify('[[ SELL #' + sell_num + ' ]] price: ' + candle.close.toFixed(digits) + ' profit: ' + profit.toFixed(digits) + ' (' + profit_pct.toFixed(2) + '%)');
       this.advice('short');
 
-      if(profit < 0)
+      if(profit_pct < 0)
       {
+        stats.losses++;
         if(hodl_after_stoploss == true)
         {
           hodl_mode = true;
@@ -354,7 +378,10 @@ hodl.check = function(candle)
           this.notify('[[ Adjusted buy_at_or_below to ' + bid.toFixed(digits) + ' to prevent immediate buy after stoploss ]]');
         }
       }
-      else if(getout == true)
+      else
+        stats.wins++;
+
+      if(getout == true)
       {
         hodl_mode == true;
         this.notify('[[[ Trading suspended due to user asking us to GET OUT :) ]]]');
