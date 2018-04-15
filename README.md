@@ -3,7 +3,7 @@
 HODL &amp; Greed Strategy for Gekko Trading Bot
 
 # Description
-This strategy is designed for wave / sideways markets but will work in 'staircase' markets too with the right settings. The general idea is to catch the bottom of a wave pattern, sell at the top, repeat!
+This strategy is designed for wave / sideways markets but will work in 'staircase' markets too with the right settings. The general idea is to catch the bottom of a wave pattern, sell when your profit requirement has been reached, repeat!
 
 This is not the kind of script that will perform well if you blindly pump various data sets for it. This method depends on market recovery (if you get caught HODL'ing without stoploss) and "hints" provded by a human either at startup time or via IRC while running.
 
@@ -33,17 +33,27 @@ It's beyond the scope of this README to assist with gekko related config and set
 # buy_at_or_below (floating point)
 Give buy advice price reaches this level or lower. If you use the dynamically adjusting feature you can set this to a very small number such as 0.0000001 and the script will automatically adjust to mean price minus your percentage for the first buy.
 
+IRC: You can adjust this live with the ;;set buyat command.
+
 # max_nobuy_candles (integer)
 If this many candles go by without a buy, adjust buy_at_or_below price. Note that adjust mode will not work until you've had enough candles pass by for SMA to be calculated. If for example you have SMA interval set to 60, then adjust mode can't possibly work until the bot sees candle #61 even if you have this set to something smaller. However, once SMA interval has been reached, it will honor this setting at all times.
+
+IRC: You can adjust this live with the ;;set nobuys command.
 
 # adjust (percentage)
 Adjust buy_at_or_below price by this percentage below SMA (mean) price.
 
+IRC: You can adjust this live with the ;;set adjust command.
+
 # greed (percentage)
 How greedy are you? :) The strategy will give sell advice if the current candle close price is this percentage above your buy price.
 
+IRC: You can adjust this live with the ;;set greed command.
+
 # stoploss (percentage)
 Standard stoploss protection. Once this strategy encounters a stoploss, trading is suspended. You'll have to manually enable trading via IRC.
+
+IRC: You can adjust this live with the ;;set stoploss command.
 
 # last_buy_price (floating point)
 Normally the script will only offer buy advice for the first trade. This presumes that your exchange account has a currency balance and no asset balance. However, if you also have an asset balance and you want the script to sell first, this is how you let it know what you paid for the asset in order to calculate necessary greed :)
@@ -52,8 +62,12 @@ This is useful if you had to restart your gekko process while you were HODL'ing 
 
 Note: Use of this feature will disable buy advice until the first sell has been advised.
 
+IRC: You can adjust this live with the ;;set buyprice command.
+
 # hodl_after_stoploss (boolean)
 You can set this to true or false. If set to true, the script will cease trading if a stoploss occurs. You can re-enable trading manually through the IRC interface with ';;set hodl off'.
+
+IRC: You can set adjust this live with the ;;set hodl_after_stoploss command
 
 # SMA Interval
 How many candles are required to calculate SMA (mean price). 
@@ -71,6 +85,9 @@ IRC support is VERY basic. The bot will only accept commands from the nickname m
 
 # ;;status
 - Shows various statistics
+
+# ;;profit
+- Shows profit & loss statistics collected since the bot's start up.
 
 # ;;buy
 - Force buy advice at next candle
