@@ -53,7 +53,7 @@ var trend_type = 'unknown';
 var chistory = [];
 chistory.length = settings.sma.interval;
 var last_action = (buy_price) ? 'buy' : 'sell';
-var version = '2018041501';
+var version = '2018041502';
 var last_candle = 'none';
 var motd = 'none';
 var hodl = {};
@@ -61,6 +61,7 @@ var force_trade = 'none';
 var hodl_mode = false;
 var getout = false;
 var hodl_after_stoploss = settings.hodl_after_stoploss;
+var stoploss = settings.stoploss;
 
 var stats = {
   wins: 0,
@@ -94,7 +95,7 @@ hodl.ircmsg = function(from, to, message)
         this.ircbot.say(replyto, 'commands: status, set, buy, sell, cancel, candle, profit');
         break;
       case ';;status':
-        this.ircbot.say(replyto, 'buyat: ' + bid.toFixed(digits) + ' last_buy: ' + buy_price + ' (' + profit_pct.toFixed(2) + '%) last_sell: ' + sell_price + ' (' + last_profit_pct.toFixed(2) + '%) nobuys: ' + cc_nobuys + ' adjust: ' + adjust + ' stoploss: ' + settings.stoploss + ' greed: ' + greed + ' trading-disabled: ' + hodl_mode + ' getout: ' + getout + ' hodl_after_SL: ' + hodl_after_stoploss);
+        this.ircbot.say(replyto, 'buyat: ' + bid.toFixed(digits) + ' last_buy: ' + buy_price + ' (' + profit_pct.toFixed(2) + '%) last_sell: ' + sell_price + ' (' + last_profit_pct.toFixed(2) + '%) nobuys: ' + cc_nobuys + ' adjust: ' + adjust + ' stoploss: ' + stoploss + ' greed: ' + greed + ' trading-disabled: ' + hodl_mode + ' getout: ' + getout + ' hodl_after_SL: ' + hodl_after_stoploss);
         break;
       case ';;profit':
         this.ircbot.say(replyto,'cur prof: ' + profit.toFixed(digits) + ' (' + profit_pct.toFixed(2) + '%) total prof: ' + stats.profit.toFixed(digits) + ' (' + stats.profit_pct.toFixed(2) + '%) wins: ' + stats.wins + ' losses: ' + stats.losses);
@@ -349,7 +350,7 @@ hodl.check = function(candle)
     }
 
     // Should we sell?
-    if(last_action == 'buy' && adviced == false && (profit_pct >= greed || (settings.stoploss > 0 && profit_pct < 0 && (profit_pct * -1) >= settings.stoploss)))
+    if(last_action == 'buy' && adviced == false && (profit_pct >= greed || (stoploss > 0 && profit_pct < 0 && (profit_pct * -1) >= stoploss)))
     {
       sell_num++;
       sell_price = candle.close;
