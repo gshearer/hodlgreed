@@ -11,11 +11,11 @@ interval=60
 
 [irc]
 enabled=false
-server=yourircserver
+server='yourircserver'
 port=6667
-nickname=hodlgreed
-realName=hodlgreed
-userName=hodlgreed
-owner=yournick
-password=null
+nickname='hodlgreed'
+realName='hodlgreed'
+userName='hodlgreed'
+owner='yournick'
+password='null'
 channels=[ '#chan1', '#chan2' ]
